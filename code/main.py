@@ -6,13 +6,14 @@ import cv2
 # let's go code an faces detector(HOG) and after detect the
 # landmarks on this detected face
 
+face_cascade = cv2.CascadeClassifier('venv/Lib/site-packages/cv2/data/haarcascade_frontalface_alt2.xml')
 # p = our pre-treined model directory, on my case, it's on the same script's diretory.
 p = "shape_predictor_68_face_landmarks.dat"
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor(p)
 
 cap = cv2.VideoCapture(0)
-
+cnt = 0
 while True:
     # Getting out image bx y webcam
     _, image = cap.read()
@@ -28,13 +29,36 @@ while True:
         shape = predictor(gray, rect)
         shape = face_utils.shape_to_np(shape)
 
-        # Draw on our image, all the finded cordinate points (x,y)
+        # Draw on our image, all the found cordinate points (x,y)
         for (x, y) in shape:
             cv2.circle(image, (x, y), 2, (0, 255, 0), -1)
+
+        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.5, minNeighbors=5)
+        for (x, y, w, h) in faces:
+            print(x, y, w, h)
+            #   capture your face
+            roi_gray = gray[y:y + h, x:x + w]
+            roi_color = image[y:y + h, x:x + w]  # (y, y + h)
+
+            cv2.imwrite("data/frame/" + str(cnt) + ".png", roi_gray)
+            cnt += 1
+            if cnt >5:
+                cnt  = 0;
+                break
+
+            color = (255, 0, 0)  # BGR
+
+            stroke = 2
+            end_cord_x_width = x + w
+            end_cord_y_height = y + h
+            cv2.rectangle(image, (x, y), (end_cord_x_width, end_cord_y_height), color, stroke)
 
     # Show the image
     cv2.imshow("Output", image)
 
+    cv2.imwrite("data/" + str(cnt) + ".png", image)
+
+    cnt += 1
     k = cv2.waitKey(5) & 0xFF
     if k == 27:
         break
