@@ -24,39 +24,52 @@ while True:
     rects = detector(gray, 0)
 
     # For each detected face, find the landmark.
+    face = 0
+    print(rects)
     for (i, rect) in enumerate(rects):
         # Make the prediction and transfom it to numpy array
         shape = predictor(gray, rect)
         shape = face_utils.shape_to_np(shape)
+        top = 99999;
+        bot = 0;
+        left = 99999
+        right = 0
+        for (x, y) in shape:
+            top = min(y,top)
+            bot = max(y,bot)
+            left = min(x,left)
+            right = max(x,right)
+
+        right += 20
+        left -= 20
+        top -=20
+        bot +=20
+
+        while (right-left) / (bot-top) > 3/4:
+            top -= 1
+            bot +=1
+
+        cv2.rectangle(image,(left,top),(right,bot),(255,0,0),2)
 
         # Draw on our image, all the found cordinate points (x,y)
         for (x, y) in shape:
             cv2.circle(image, (x, y), 2, (0, 255, 0), -1)
 
-        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.5, minNeighbors=5)
-        for (x, y, w, h) in faces:
-            print(x, y, w, h)
-            #   capture your face
-            roi_gray = gray[y:y + h, x:x + w]
-            roi_color = image[y:y + h, x:x + w]  # (y, y + h)
+            #cv2.rectangle(image, (x, y), (end_cord_x_width, end_cord_y_height), color, stroke)
 
-           # cv2.imwrite("data/frame/" + str(cnt) + ".png", roi_gray)
-            cnt += 1
-            if cnt >5:
-                cnt  = 0;
-                break
+        face = image[top:bot, left:right]
 
-            color = (255, 0, 0)  # BGR
 
-            stroke = 2
-            end_cord_x_width = x + w
-            end_cord_y_height = y + h
-            # cv2.rectangle(image, (x, y), (end_cord_x_width, end_cord_y_height), color, stroke)
+        # Show the image
+        cv2.imshow("Output", face)
+        cv2.imwrite("data/" + str(cnt) + ".png", face)
+        w = right - left;
+        h = bot - top
+        with open("data/"+ str(cnt) + ".txt","w") as o:
+            for (x, y) in shape:
+                o.write(str(((x-left) / w))+" "+str(((y - top) / h))+"\n")
 
-    # Show the image
-    cv2.imshow("Output", image)
 
-    cv2.imwrite("data/" + str(cnt) + ".png", image)
 
     cnt += 1
     k = cv2.waitKey(5) & 0xFF
