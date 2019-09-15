@@ -4,21 +4,6 @@
     <list default="true" id="75f776c6-d7ad-4d97-a71a-62553411b30d" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/code/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/0.png" beforeDir="false" afterPath="$PROJECT_DIR$/data/0.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/1.png" beforeDir="false" afterPath="$PROJECT_DIR$/data/1.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/2.png" beforeDir="false" afterPath="$PROJECT_DIR$/data/2.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/3.png" beforeDir="false" afterPath="$PROJECT_DIR$/data/3.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/4.png" beforeDir="false" afterPath="$PROJECT_DIR$/data/4.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/5.png" beforeDir="false" afterPath="$PROJECT_DIR$/data/5.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/6.png" beforeDir="false" afterPath="$PROJECT_DIR$/data/6.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/frame/0.png" beforeDir="false" afterPath="$PROJECT_DIR$/data/frame/0.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/frame/1.png" beforeDir="false" afterPath="$PROJECT_DIR$/data/frame/1.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/frame/2.png" beforeDir="false" afterPath="$PROJECT_DIR$/data/frame/2.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/frame/3.png" beforeDir="false" afterPath="$PROJECT_DIR$/data/frame/3.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/frame/4.png" beforeDir="false" afterPath="$PROJECT_DIR$/data/frame/4.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/frame/5.png" beforeDir="false" afterPath="$PROJECT_DIR$/data/frame/5.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/frame/6.png" beforeDir="false" afterPath="$PROJECT_DIR$/data/frame/6.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/frame/7.png" beforeDir="false" afterPath="$PROJECT_DIR$/data/frame/7.png" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -52,7 +37,29 @@
       </list>
     </option>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.main">
+    <configuration name="main (1)" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="Recignizer" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/code" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/code/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Recignizer" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -78,6 +85,7 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.main" />
+        <item itemvalue="Python.main (1)" />
       </list>
     </recent_temporary>
   </component>
@@ -94,7 +102,8 @@
       <workItem from="1567969504917" duration="2757000" />
       <workItem from="1568015051451" duration="5203000" />
       <workItem from="1568103626345" duration="10000" />
-      <workItem from="1568538807175" duration="26000" />
+      <workItem from="1568538807175" duration="682000" />
+      <workItem from="1568570209511" duration="10723000" />
     </task>
     <servers />
   </component>
@@ -115,6 +124,7 @@
     </option>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Recignizer$main.coverage" NAME="main Coverage Results" MODIFIED="1568033890555" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Recignizer$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1568570625079" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/code" />
+    <SUITE FILE_PATH="coverage/Recignizer$main.coverage" NAME="main Coverage Results" MODIFIED="1568579724356" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
