@@ -40,7 +40,7 @@ while True:
             roi_gray = gray[y:y + h, x:x + w]
             roi_color = image[y:y + h, x:x + w]  # (y, y + h)
 
-            cv2.imwrite("data/frame/" + str(cnt) + ".png", roi_gray)
+           # cv2.imwrite("data/frame/" + str(cnt) + ".png", roi_gray)
             cnt += 1
             if cnt >5:
                 cnt  = 0;
@@ -51,7 +51,7 @@ while True:
             stroke = 2
             end_cord_x_width = x + w
             end_cord_y_height = y + h
-            cv2.rectangle(image, (x, y), (end_cord_x_width, end_cord_y_height), color, stroke)
+            # cv2.rectangle(image, (x, y), (end_cord_x_width, end_cord_y_height), color, stroke)
 
     # Show the image
     cv2.imshow("Output", image)
