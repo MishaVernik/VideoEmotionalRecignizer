@@ -6,7 +6,12 @@ from imutils import face_utils
 import dlib
 import cv2
 import sys
+from kmean import *
 from PyQt5 import QtCore, QtGui, QtWidgets
+
+    
+
+
 # landmarks on this detected face
 class Recognizer:
     def __init__(self, path, progressBar):
@@ -25,7 +30,7 @@ class Recognizer:
         self.cnt = 0
         if self.cap.isOpened() == False:
             print("Error opening video stream or file")
-        try:
+        if 1:
             while self.cap.isOpened():
                 # Getting out image bx y webcam
                 self._, self.image = self.cap.read()
@@ -61,9 +66,29 @@ class Recognizer:
 
                     cv2.rectangle(self.image, (left, top), (right, bot), (255, 0, 0), 2)
 
+                    w = right - left;
+                    h = bot - top
+                    points = []
+                    for (x, y) in shape:
+                        points.append( Point((x,y) ))
+
+                    clusters = []
+                    if len(points) > 0:
+                        try:
+                            clusters = kmeans(points,3,0.1)
+                        except Exception as e:
+                            print(e)
+
                     # Draw on our image, all the found cordinate points (x,y)
                     for (x, y) in shape:
                         cv2.circle(self.image, (x, y), 2, (0, 255, 0), -1)
+                    if len(points) > 0:
+                        for c in clusters:
+                            try:
+                                c = c.calculateCentroid().coords
+                            except Exception as e:
+                                print(e)
+                            cv2.circle(self.image, (int(c[0]), int(c[1])), 2, (255, 0, 0), -1)
 
                         # cv2.rectangle(image, (x, y), (end_cord_x_width, end_cord_y_height), color, stroke)
 
@@ -74,8 +99,8 @@ class Recognizer:
 
                     if self.cnt % 10 == 0:
                         cv2.imwrite("data/" + str(self.cnt) + ".png", face)
-                        w = right - left;
-                        h = bot - top
+                        
+
                         with open("data/" + str(self.cnt) + ".txt", "w") as o:
                             for (x, y) in shape:
                                 o.write(str(((x - left) / w)) + " " + str(((y - top) / h)) + "\n")
@@ -89,8 +114,7 @@ class Recognizer:
                 k = cv2.waitKey(5) & 0xFF
                 if k == 27:
                     break
-        except:
-            print("An exception occurred")
+            
 
         cv2.destroyAllWindows()
         self.cap.release()
