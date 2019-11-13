@@ -1,6 +1,7 @@
 # Prerequisites
 *.d
 data
+venv_old
 
 # Compiled Object files
 *.slo

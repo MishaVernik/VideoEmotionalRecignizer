@@ -1,3 +1,5 @@
+import os
+
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QFileDialog, QLabel, QHBoxLayout, QProgressBar
 from PyQt5.QtWidgets import QApplication, QWidget
@@ -7,11 +9,25 @@ import dlib
 import cv2
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
+
+
 # landmarks on this detected face
 class Recognizer:
+    '''
+        @method: __init__
+            @__init__ : initialize data to the class Recognizer
+        @params: path, progressBar
+            @path : OS system path to the project (or to the file main.py)
+            @progressBar : object that contains UI progressBar
+    '''
     def __init__(self, path, progressBar):
         self.path = path
         self.progressBar = progressBar
+    '''
+        @method: recognize_frames
+            @recognize_frames : receives before generated shape_predictor_68_face_landmarks.dat + takes 
+            haarcascade_frontalface_alt2.xml to recognize 68 points on the face.               
+    '''
     def recognize_frames(self):
         self.number_of_all_frames = self.count_frames_manual(self.path)
         print(self.number_of_all_frames)
@@ -73,27 +89,69 @@ class Recognizer:
                     # cv2.imshow("Output", face)
 
                     if self.cnt % 10 == 0:
-                        cv2.imwrite("data/" + str(self.cnt) + ".png", face)
-                        w = right - left;
+                        cv2.imwrite("data/photos/" + str(self.cnt) + ".png", face)
+                        w = right - left
                         h = bot - top
-                        with open("data/" + str(self.cnt) + ".txt", "w") as o:
+                        with open("data/coordinates/" + str(self.cnt) + ".txt", "w") as o:
+                            '''
+                                Points that define whole face of dots: 
+                                    Jawline  : [1 - 17]
+                                    Eyes     : [37 - 42] (left-eye)
+                                    Eyes     : [43 - 48] (right-eye) 
+                                    Eyebrows : [18 - 22] (left-eyebrow)
+                                    Eyebrows : [23 - 27] (right-eyebrow)
+                                    Nose     : [28 - 36]
+                                    Mouth    : [49 - 68]                              
+                            '''
+                            point_counter = 1
+
+                            introduction_label = True
                             for (x, y) in shape:
-                                o.write(str(((x - left) / w)) + " " + str(((y - top) / h)) + "\n")
-                print("he1")
-                if (int((100 * self.cnt + 1) / self.number_of_all_frames) >= 100):
+                                if 1 <= point_counter <= 17 and introduction_label == True:
+                                    introduction_label = False
+                                    o.write("\nJawLine\n (")
+                                elif 18 <= point_counter <= 22 and introduction_label == False:
+                                    introduction_label = True
+                                    o.write(")\nLeft-eyebrow\n (")
+                                elif 23 <= point_counter <= 27 and introduction_label == True:
+                                    introduction_label = False
+                                    o.write(")\nRight-eyebrow\n (")
+                                elif 28 <= point_counter <= 36 and introduction_label == False:
+                                    introduction_label = True
+                                    o.write(")\nNose\n (")
+                                elif 37 <= point_counter <= 42 and introduction_label == True:
+                                    introduction_label = False
+                                    o.write(")\nLeft-eye\n (")
+                                elif 43 <= point_counter <= 48 and introduction_label == False:
+                                    introduction_label = True
+                                    o.write(")\nRight-eye\n (")
+                                elif 49 <= point_counter <= 68 and introduction_label == True:
+                                    introduction_label = False
+                                    o.write(")\nMouth\n (")
+                                o.write('[' + str(((x - left) / w)) + " " + str(((y - top) / h)) + "],")
+                                point_counter += 1
+                                if point_counter == 68:
+                                    o.write(')')
+                if (int((100 * self.cnt) / self.number_of_all_frames) >= 100):
                     self.progressBar.setValue(100)
                 else:
                     self.progressBar.setValue(int(100 * self.cnt / self.number_of_all_frames))
                 self.cnt += 1
-                print("he")
+
                 k = cv2.waitKey(5) & 0xFF
                 if k == 27:
                     break
-        except:
-            print("An exception occurred")
-
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
         cv2.destroyAllWindows()
         self.cap.release()
+
+    '''
+           @method: show_recognized_video
+               @recognize_frames : shows generated video          
+    '''
     def show_recognized_video(self):
         self.face_cascade = cv2.CascadeClassifier('venv/Lib/site-packages/cv2/data/haarcascade_frontalface_alt2.xml')
         # p = our pre-treined model directory, on my case, it's on the same script's diretory.
@@ -140,7 +198,7 @@ class Recognizer:
                         top -= 1
                         bot += 1
 
-                   # cv2.rectangle(self.image, (left, top), (right, bot), (255, 0, 0), 2)
+                    # cv2.rectangle(self.image, (left, top), (right, bot), (255, 0, 0), 2)
 
                     # Draw on our image, all the found cordinate points (x,y)
                     for (x, y) in shape:
@@ -148,7 +206,7 @@ class Recognizer:
 
                         # cv2.rectangle(image, (x, y), (end_cord_x_width, end_cord_y_height), color, stroke)
 
-                    #face = self.image[top:bot, left:right]
+                    # face = self.image[top:bot, left:right]
 
                     # Show the image
 
@@ -158,12 +216,19 @@ class Recognizer:
                 k = cv2.waitKey(5) & 0xFF
                 if k == 27:
                     break
-        except:
-            print("An exception occurred")
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
 
         cv2.destroyAllWindows()
         self.cap.release()
-
+    '''
+        @method: count_frames_manual
+            @count_frames_manual : counts all frames in the video to define 100 % progress bar line 
+        @params: path
+            @path : OS system path to the project (or to the file main.py)             
+    '''
     def count_frames_manual(self, path):
         video = cv2.VideoCapture(path)
         cnt = 0
@@ -186,6 +251,7 @@ class Recognizer:
 
         # return the total number of frames in the video file
         return total
+
 class UIapp(QWidget):
 
     def __init__(self):
@@ -196,13 +262,15 @@ class UIapp(QWidget):
     def start(self):
         recognizer = Recognizer(self.path, self.pbar)
         recognizer.recognize_frames()
+
     def show_video(self):
         recognizer = Recognizer(self.path, self.pbar)
         recognizer.show_recognized_video()
         print(1)
+
     def openFile(self):
-        options =     QFileDialog.Options()
-        options |=    QFileDialog.DontUseNativeDialog
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getOpenFileName(self,
                                                   "QFileDialog.getOpenFileName()",
                                                   "",
@@ -211,6 +279,7 @@ class UIapp(QWidget):
         if fileName:
             print(fileName)
             self.path = fileName
+
     def initUI(self):
         self.pbar = QProgressBar(self)
         self.pbar.setGeometry(120, 300, 400, 35)
@@ -243,8 +312,6 @@ class UIapp(QWidget):
         layout.addWidget(qbtnStart)
         layout.addWidget(qbtnQuit)
         layout.addWidget(qbtnSelectShowVideo)
-
-
 
         self.show()
 
@@ -316,5 +383,4 @@ if __name__ == '__main__':
     app.setStyleSheet(StyleSheet)
     ex = UIapp()
     sys.exit(app.exec_())
-    #video_recognizer = Recognizer()
-
+    # video_recognizer = Recognizer()
