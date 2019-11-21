@@ -8,6 +8,7 @@ from imutils import face_utils
 import dlib
 import cv2
 import sys
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
@@ -20,131 +21,142 @@ class Recognizer:
             @path : OS system path to the project (or to the file main.py)
             @progressBar : object that contains UI progressBar
     '''
+
     def __init__(self, path, progressBar):
+        self._, self.image = self.cap.read()
+        self.gray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
+        self.rects = self.detector(self.gray, 0)
         self.path = path
         self.progressBar = progressBar
+
     '''
         @method: recognize_frames
             @recognize_frames : receives before generated shape_predictor_68_face_landmarks.dat + takes 
             haarcascade_frontalface_alt2.xml to recognize 68 points on the face.               
     '''
+
     def recognize_frames(self):
-        self.number_of_all_frames = self.count_frames_manual(self.path)
-        print(self.number_of_all_frames)
-        face_cascade = cv2.CascadeClassifier('venv/Lib/site-packages/cv2/data/haarcascade_frontalface_alt2.xml')
-        # p = our pre-treined model directory, on my case, it's on the same script's diretory.
-        self.p = "shape_predictor_68_face_landmarks.dat"
-        self.detector = dlib.get_frontal_face_detector()
-        self.predictor = dlib.shape_predictor(self.p)
-
-        self.cap = cv2.VideoCapture(self.path)
-        self.cnt = 0
-        if self.cap.isOpened() == False:
-            print("Error opening video stream or file")
         try:
-            while self.cap.isOpened():
-                # Getting out image bx y webcam
-                self._, self.image = self.cap.read()
-                # Converting the image to gray scale
-                self.gray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
-                # Get faces into webcam's image
-                self.rects = self.detector(self.gray, 0)
-                # For each detected face, find the landmark.
-                self.face = 0
-                print(self.rects)
-                for (i, rect) in enumerate(self.rects):
-                    # Make the prediction and transfom it to numpy array
-                    shape = self.predictor(self.gray, rect)
-                    shape = face_utils.shape_to_np(shape)
-                    top = 99999;
-                    bot = 0;
-                    left = 99999
-                    right = 0
-                    for (x, y) in shape:
-                        top = min(y, top)
-                        bot = max(y, bot)
-                        left = min(x, left)
-                        right = max(x, right)
+            self.number_of_all_frames = self.count_frames_manual(self.path)
+            print(self.number_of_all_frames)
+            face_cascade = cv2.CascadeClassifier('venv/Lib/site-packages/cv2/data/haarcascade_frontalface_alt2.xml')
+            # p = our pre-treined model directory, on my case, it's on the same script's diretory.
+            self.p = "shape_predictor_68_face_landmarks.dat"
+            self.detector = dlib.get_frontal_face_detector()
+            self.predictor = dlib.shape_predictor(self.p)
 
-                    right += 20
-                    left -= 20
-                    top -= 20
-                    bot += 20
+            self.cap = cv2.VideoCapture(self.path)
+            self.cnt = 0
+            if not self.cap.isOpened():
+                print("Error opening video stream or file")
+            if 1:
+                while self.cap.isOpened():
+                    # Getting out image bx y webcam
+                    # Converting the image to gray scale
+                    # Get faces into webcam's image
+                    # For each detected face, find the landmark.
+                    self.face = 0
+                    print(self.rects)
+                    for (i, rect) in enumerate(self.rects):
+                        # Make the prediction and transfom it to numpy array
+                        shape = self.predictor(self.gray, rect)
+                        shape = face_utils.shape_to_np(shape)
+                        top = 99999
+                        bot = 0
+                        left = 99999
+                        right = 0
+                        for (x, y) in shape:
+                            top = min(y, top)
+                            bot = max(y, bot)
+                            left = min(x, left)
+                            right = max(x, right)
 
-                    while (right - left) / (bot - top) > 3 / 4:
-                        top -= 1
-                        bot += 1
+                        right += 20
+                        left -= 20
+                        top -= 20
+                        bot += 20
 
-                    cv2.rectangle(self.image, (left, top), (right, bot), (255, 0, 0), 2)
+                        while (right - left) / (bot - top) > 3 / 4:
+                            top -= 1
+                            bot += 1
 
-                    # Draw on our image, all the found cordinate points (x,y)
-                    for (x, y) in shape:
-                        cv2.circle(self.image, (x, y), 2, (0, 255, 0), -1)
+                        cv2.rectangle(self.image, (left, top), (right, bot), (255, 0, 0), 2)
+
+                        w = right - left
+                        h = bot - top
 
                         # cv2.rectangle(image, (x, y), (end_cord_x_width, end_cord_y_height), color, stroke)
 
-                    face = self.image[top:bot, left:right]
+                        face = self.image[top:bot, left:right]
 
-                    # Show the image
-                    # cv2.imshow("Output", face)
+                        # Show the image
+                        # cv2.imshow("Output", face)
 
-                    if self.cnt % 10 == 0:
-                        cv2.imwrite("data/photos/" + str(self.cnt) + ".png", face)
-                        w = right - left
-                        h = bot - top
-                        with open("data/coordinates/" + str(self.cnt) + ".txt", "w") as o:
-                            '''
-                                Points that define whole face of dots: 
-                                    Jawline  : [1 - 17]
-                                    Eyes     : [37 - 42] (left-eye)
-                                    Eyes     : [43 - 48] (right-eye) 
-                                    Eyebrows : [18 - 22] (left-eyebrow)
-                                    Eyebrows : [23 - 27] (right-eyebrow)
-                                    Nose     : [28 - 36]
-                                    Mouth    : [49 - 68]                              
-                            '''
-                            point_counter = 1
+                        if self.cnt % 10 == 0:
 
-                            introduction_label = True
-                            for (x, y) in shape:
-                                if 1 <= point_counter <= 17 and introduction_label == True:
-                                    introduction_label = False
-                                    o.write("\nJawLine\n (")
-                                elif 18 <= point_counter <= 22 and introduction_label == False:
-                                    introduction_label = True
-                                    o.write(")\nLeft-eyebrow\n (")
-                                elif 23 <= point_counter <= 27 and introduction_label == True:
-                                    introduction_label = False
-                                    o.write(")\nRight-eyebrow\n (")
-                                elif 28 <= point_counter <= 36 and introduction_label == False:
-                                    introduction_label = True
-                                    o.write(")\nNose\n (")
-                                elif 37 <= point_counter <= 42 and introduction_label == True:
-                                    introduction_label = False
-                                    o.write(")\nLeft-eye\n (")
-                                elif 43 <= point_counter <= 48 and introduction_label == False:
-                                    introduction_label = True
-                                    o.write(")\nRight-eye\n (")
-                                elif 49 <= point_counter <= 68 and introduction_label == True:
-                                    introduction_label = False
-                                    o.write(")\nMouth\n (")
-                                o.write('[' + str(((x - left) / w)) + " " + str(((y - top) / h)) + "],")
-                                point_counter += 1
-                                if point_counter == 68:
-                                    o.write(')')
-                if (int((100 * self.cnt) / self.number_of_all_frames) >= 100):
-                    self.progressBar.setValue(100)
-                else:
-                    self.progressBar.setValue(int(100 * self.cnt / self.number_of_all_frames))
-                self.cnt += 1
+                            cv2.imwrite("data/photos/" + str(self.cnt) + ".png", face)
+                            w = right - left
+                            h = bot - top
+                            with open("data/coordinates/" + str(self.cnt) + ".txt", "w") as o:
+                                '''
+                                    Points that define whole face of dots: 
+                                        Jawline  : [1 - 17]
+                                        Eyes     : [37 - 42] (left-eye)
+                                        Eyes     : [43 - 48] (right-eye) 
+                                        Eyebrows : [18 - 22] (left-eyebrow)
+                                        Eyebrows : [23 - 27] (right-eyebrow)
+                                        Nose     : [28 - 36]
+                                        Mouth    : [49 - 68]                              
+                                '''
+                                point_counter = 1
 
-                k = cv2.waitKey(5) & 0xFF
-                if k == 27:
-                    break
+                                introduction_label = True
+
+                            cv2.imwrite("data/" + str(self.cnt) + ".png", face)
+
+                            with open("data/" + str(self.cnt) + ".txt", "w") as o:
+
+                                for (x, y) in shape:
+                                    if 1 <= point_counter <= 17 and introduction_label == True:
+                                        introduction_label = False
+                                        o.write("\nJawLine\n (")
+                                    elif 18 <= point_counter <= 22 and introduction_label == False:
+                                        introduction_label = True
+                                        o.write(")\nLeft-eyebrow\n (")
+                                    elif 23 <= point_counter <= 27 and introduction_label == True:
+                                        introduction_label = False
+                                        o.write(")\nRight-eyebrow\n (")
+                                    elif 28 <= point_counter <= 36 and introduction_label == False:
+                                        introduction_label = True
+                                        o.write(")\nNose\n (")
+                                    elif 37 <= point_counter <= 42 and introduction_label == True:
+                                        introduction_label = False
+                                        o.write(")\nLeft-eye\n (")
+                                    elif 43 <= point_counter <= 48 and introduction_label == False:
+                                        introduction_label = True
+                                        o.write(")\nRight-eye\n (")
+                                    elif 49 <= point_counter <= 68 and introduction_label == True:
+                                        introduction_label = False
+                                        o.write(")\nMouth\n (")
+                                    o.write('[' + str(((x - left) / w)) + " " + str(((y - top) / h)) + "],")
+                                    point_counter += 1
+                                    if point_counter == 68:
+                                        o.write(')')
+                    if (int((100 * self.cnt) / self.number_of_all_frames) >= 100):
+                        self.progressBar.setValue(100)
+                    else:
+                        self.progressBar.setValue(int(100 * self.cnt / self.number_of_all_frames))
+                    self.cnt += 1
+
+                    k = cv2.waitKey(5) & 0xFF
+                    if k == 27:
+                        break
+
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
+
         cv2.destroyAllWindows()
         self.cap.release()
 
@@ -152,6 +164,7 @@ class Recognizer:
            @method: show_recognized_video
                @recognize_frames : shows generated video          
     '''
+
     def show_recognized_video(self):
         self.face_cascade = cv2.CascadeClassifier('venv/Lib/site-packages/cv2/data/haarcascade_frontalface_alt2.xml')
         # p = our pre-treined model directory, on my case, it's on the same script's diretory.
@@ -223,12 +236,14 @@ class Recognizer:
 
         cv2.destroyAllWindows()
         self.cap.release()
+
     '''
         @method: count_frames_manual
             @count_frames_manual : counts all frames in the video to define 100 % progress bar line 
         @params: path
             @path : OS system path to the project (or to the file main.py)             
     '''
+
     def count_frames_manual(self, path):
         video = cv2.VideoCapture(path)
         cnt = 0
@@ -251,6 +266,7 @@ class Recognizer:
 
         # return the total number of frames in the video file
         return total
+
 
 class UIapp(QWidget):
 
