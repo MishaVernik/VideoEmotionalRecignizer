@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="75f776c6-d7ad-4d97-a71a-62553411b30d" name="Default Changelist" comment="Merge branch 'master' of https://github.com/MishaVernik/VideoEmotionalRecognizer&#10;&#10;# Conflicts:&#10;#&#9;code/main.py">
-      <change afterPath="$PROJECT_DIR$/code/kmean.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/code/retrain_dlib.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/code/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/main.py" afterDir="false" />
     </list>
@@ -40,7 +38,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.retrain_dlib">
+  <component name="RunManager" selected="Python.main">
     <configuration name="main (1)" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Recignizer" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -113,8 +111,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.retrain_dlib" />
         <item itemvalue="Python.main (1)" />
+        <item itemvalue="Python.retrain_dlib" />
       </list>
     </recent_temporary>
   </component>

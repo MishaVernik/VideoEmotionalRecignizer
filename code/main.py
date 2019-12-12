@@ -23,9 +23,7 @@ class Recognizer:
     '''
 
     def __init__(self, path, progressBar):
-        self._, self.image = self.cap.read()
-        self.gray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
-        self.rects = self.detector(self.gray, 0)
+
         self.path = path
         self.progressBar = progressBar
 
@@ -37,6 +35,7 @@ class Recognizer:
 
     def recognize_frames(self):
         try:
+
             self.number_of_all_frames = self.count_frames_manual(self.path)
             print(self.number_of_all_frames)
             face_cascade = cv2.CascadeClassifier('venv/Lib/site-packages/cv2/data/haarcascade_frontalface_alt2.xml')
@@ -47,10 +46,18 @@ class Recognizer:
 
             self.cap = cv2.VideoCapture(self.path)
             self.cnt = 0
-            if not self.cap.isOpened():
+            if self.cap.isOpened() == False:
                 print("Error opening video stream or file")
+
             if 1:
-                while self.cap.isOpened():
+                while self.cap.isOpened():# Getting out image bx y webcam
+                    self._, self.image = self.cap.read()
+                    # Converting the image to gray scale
+                    self.gray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
+                    # Get faces into webcam's image
+                    self.rects = self.detector(self.gray, 0)
+                    # For each detected face, find the landmark.
+
                     # Getting out image bx y webcam
                     # Converting the image to gray scale
                     # Get faces into webcam's image
@@ -111,38 +118,59 @@ class Recognizer:
                                 point_counter = 1
 
                                 introduction_label = True
-
-                            cv2.imwrite("data/" + str(self.cnt) + ".png", face)
-
-                            with open("data/" + str(self.cnt) + ".txt", "w") as o:
-
+                                prev_point_x = -1
+                                prev_point_y = -1
                                 for (x, y) in shape:
                                     if 1 <= point_counter <= 17 and introduction_label == True:
                                         introduction_label = False
+                                        prev_point_x = -1
+                                        prev_point_y = -1
                                         o.write("\nJawLine\n (")
                                     elif 18 <= point_counter <= 22 and introduction_label == False:
                                         introduction_label = True
+                                        prev_point_x = -1
+                                        prev_point_y = -1
                                         o.write(")\nLeft-eyebrow\n (")
                                     elif 23 <= point_counter <= 27 and introduction_label == True:
                                         introduction_label = False
+                                        prev_point_x = -1
+                                        prev_point_y = -1
                                         o.write(")\nRight-eyebrow\n (")
                                     elif 28 <= point_counter <= 36 and introduction_label == False:
                                         introduction_label = True
+                                        prev_point_x = -1
+                                        prev_point_y = -1
                                         o.write(")\nNose\n (")
                                     elif 37 <= point_counter <= 42 and introduction_label == True:
                                         introduction_label = False
+                                        prev_point_x = -1
+                                        prev_point_y = -1
                                         o.write(")\nLeft-eye\n (")
                                     elif 43 <= point_counter <= 48 and introduction_label == False:
                                         introduction_label = True
+                                        prev_point_x = -1
+                                        prev_point_y = -1
                                         o.write(")\nRight-eye\n (")
                                     elif 49 <= point_counter <= 68 and introduction_label == True:
                                         introduction_label = False
+                                        prev_point_x = -1
+                                        prev_point_y = -1
                                         o.write(")\nMouth\n (")
-                                    o.write('[' + str(((x - left) / w)) + " " + str(((y - top) / h)) + "],")
+                                    if prev_point_x == -1 and prev_point_y == -1:
+                                        prev_point_x = (x - left) / w
+                                        prev_point_y = (y - top) / h
+                                    else:
+                                        # interpolating points
+                                        o.write(',[' + str((prev_point_x + (x - left) / w) / 2) + " " + str(
+                                            (prev_point_y + (y - top) / h) / 2) + "],")
+                                        prev_point_x = (x - left) / w
+                                        prev_point_y = (y - top) / h
+                                    o.write('[' + str(((x - left) / w)) + " " + str(((y - top) / h)) + "]")
+
                                     point_counter += 1
                                     if point_counter == 68:
                                         o.write(')')
-                    if (int((100 * self.cnt) / self.number_of_all_frames) >= 100):
+                    if int((100 * self.cnt) / self.number_of_all_frames) >= 100:
                         self.progressBar.setValue(100)
                     else:
                         self.progressBar.setValue(int(100 * self.cnt / self.number_of_all_frames))
