@@ -8,7 +8,7 @@ from imutils import face_utils
 import dlib
 import cv2
 import sys
-
+from random import randrange
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
@@ -52,6 +52,7 @@ class Recognizer:
             if 1:
                 while self.cap.isOpened():# Getting out image bx y webcam
                     self._, self.image = self.cap.read()
+                    self.tmp_image = self.image
                     # Converting the image to gray scale
                     self.gray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
                     # Get faces into webcam's image
@@ -98,10 +99,12 @@ class Recognizer:
 
                         # Show the image
                         # cv2.imshow("Output", face)
-
+                        prev_x = 0
+                        prev_y = 0
                         if self.cnt % 10 == 0:
 
                             cv2.imwrite("data/photos/" + str(self.cnt) + ".png", face)
+
                             w = right - left
                             h = bot - top
                             with open("data/coordinates/" + str(self.cnt) + ".txt", "w") as o:
@@ -120,60 +123,89 @@ class Recognizer:
                                 introduction_label = True
                                 prev_point_x = -1
                                 prev_point_y = -1
+                                color_state = (255, 255,0);
                                 for (x, y) in shape:
                                     if 1 <= point_counter <= 17 and introduction_label == True:
                                         introduction_label = False
                                         prev_point_x = -1
                                         prev_point_y = -1
                                         o.write("\nJawLine\n (")
+                                        color_state = (255, 255, 0)
                                     elif 18 <= point_counter <= 22 and introduction_label == False:
                                         introduction_label = True
                                         prev_point_x = -1
                                         prev_point_y = -1
                                         o.write(")\nLeft-eyebrow\n (")
+                                        color_state = (0, 76, 153)
                                     elif 23 <= point_counter <= 27 and introduction_label == True:
                                         introduction_label = False
                                         prev_point_x = -1
                                         prev_point_y = -1
                                         o.write(")\nRight-eyebrow\n (")
+                                        cv2.circle(self.image, (x, y), 2, (0, 76, 153), -1)
+                                        color_state = (0, 76, 153)
                                     elif 28 <= point_counter <= 36 and introduction_label == False:
                                         introduction_label = True
                                         prev_point_x = -1
                                         prev_point_y = -1
                                         o.write(")\nNose\n (")
+                                        color_state = (255, 51, 51)
                                     elif 37 <= point_counter <= 42 and introduction_label == True:
                                         introduction_label = False
                                         prev_point_x = -1
                                         prev_point_y = -1
                                         o.write(")\nLeft-eye\n (")
+                                        color_state = (204, 204, 0)
                                     elif 43 <= point_counter <= 48 and introduction_label == False:
                                         introduction_label = True
                                         prev_point_x = -1
                                         prev_point_y = -1
                                         o.write(")\nRight-eye\n (")
+                                        color_state = (204, 204, 0)
                                     elif 49 <= point_counter <= 68 and introduction_label == True:
                                         introduction_label = False
                                         prev_point_x = -1
                                         prev_point_y = -1
                                         o.write(")\nMouth\n (")
+                                        color_state = (0, 255, 0)
+                                    # Printing dots
+                                    # Important!!
+                                    # x and y are the points of the original picture
+                                    # so that, they look like (543, 211) instead of
+                                    # new_x and new_y = (0,12312335; 0,381238323)
+                                    # because new points normalized
+                                    cv2.circle(self.image, (x, y), 2, color_state, -1)
+                                    if prev_point_y != -1 and prev_point_x != -1:
+                                        cv2.circle(self.image, (int((x + prev_x) / 2),  int((y + prev_y) / 2)), 2,
+                                                   color_state, -1)
                                     if prev_point_x == -1 and prev_point_y == -1:
                                         prev_point_x = (x - left) / w
                                         prev_point_y = (y - top) / h
+                                        prev_x = x
+                                        prev_y = y
                                     else:
                                         # interpolating points
                                         o.write(',[' + str((prev_point_x + (x - left) / w) / 2) + " " + str(
                                             (prev_point_y + (y - top) / h) / 2) + "],")
                                         prev_point_x = (x - left) / w
                                         prev_point_y = (y - top) / h
+                                        prev_x = x
+                                        prev_y = y
                                     o.write('[' + str(((x - left) / w)) + " " + str(((y - top) / h)) + "]")
 
                                     point_counter += 1
                                     if point_counter == 68:
                                         o.write(')')
+
+
+                            face = self.image[top:bot, left:right]
+                            cv2.imwrite("data/dots/" + str(self.cnt) + ".png", face)
                     if int((100 * self.cnt) / self.number_of_all_frames) >= 100:
                         self.progressBar.setValue(100)
                     else:
-                        self.progressBar.setValue(int(100 * self.cnt / self.number_of_all_frames))
+                        self.progressBar.setValue(int(100 * self.cnt / self.number_of_all_frames) + 1)
+
+
                     self.cnt += 1
 
                     k = cv2.waitKey(5) & 0xFF

@@ -1,0 +1,7 @@
+https://pysource.com/2019/03/15/how-to-install-python-3-and-opencv-4-on-windows/
+https://www.learnopencv.com/install-dlib-on-windows/
+
+1. Установка OpenCV
+2. Установка dlib
+3. Установка face_utils
+4. Установка PyQT
